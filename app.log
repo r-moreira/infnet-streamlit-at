@@ -1,0 +1,109 @@
+2024-09-29 17:44:48,673 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:44:51,738 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:44:51,739 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0581d0>
+2024-09-29 17:45:30,315 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:45:30,315 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x1023af450>
+2024-09-29 17:45:43,778 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:45:43,778 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x102ba7550>
+2024-09-29 17:46:19,269 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:46:24,792 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:46:24,793 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10dbc7790>
+2024-09-29 17:46:26,928 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP_ANALYSIS
+2024-09-29 17:46:31,413 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:46:31,413 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e035090>
+2024-09-29 17:46:40,708 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:46:40,708 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x102f64150>
+2024-09-29 17:49:37,029 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:49:37,029 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10dd472d0>
+2024-09-29 17:49:40,095 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:49:40,095 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10dd2c4d0>
+2024-09-29 17:50:12,062 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:50:12,063 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e05ae50>
+2024-09-29 17:50:56,120 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:50:56,121 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0c05d0>
+2024-09-29 17:51:02,712 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:52:32,845 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:52:32,846 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0aa990>
+2024-09-29 17:52:34,863 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:52:34,864 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0c44d0>
+2024-09-29 17:52:36,686 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:52:36,686 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x105a84490>
+2024-09-29 17:52:37,651 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:52:37,651 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0c53d0>
+2024-09-29 17:52:38,393 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:52:38,394 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0c7650>
+2024-09-29 17:52:39,010 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:52:39,010 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0c7c50>
+2024-09-29 17:52:39,526 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:52:39,527 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0c68d0>
+2024-09-29 17:52:40,047 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:52:40,047 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0aa010>
+2024-09-29 17:52:40,563 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:52:40,563 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0f2650>
+2024-09-29 17:53:00,169 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:53:00,170 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0f0d90>
+2024-09-29 17:53:03,675 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:03,675 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0f1790>
+2024-09-29 17:53:17,834 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:17,835 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e034350>
+2024-09-29 17:53:19,808 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:19,808 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0c46d0>
+2024-09-29 17:53:21,229 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:21,230 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0e90d0>
+2024-09-29 17:53:22,546 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:22,546 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e0a93d0>
+2024-09-29 17:53:24,542 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:24,542 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10dd2eed0>
+2024-09-29 17:53:26,581 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:41,906 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:53:49,243 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:54:10,665 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:54:16,780 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:54:23,312 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:54:23,312 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e157150>
+2024-09-29 17:54:25,195 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:54:25,195 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e16c550>
+2024-09-29 17:54:47,096 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:54:55,045 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:55:20,234 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:55:20,235 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0aa790>
+2024-09-29 17:55:26,229 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:55:26,229 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e18c950>
+2024-09-29 17:55:28,917 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:55:28,917 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e16dc50>
+2024-09-29 17:55:33,578 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:55:33,579 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e02a190>
+2024-09-29 17:55:36,228 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:55:36,228 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e0aa4d0>
+2024-09-29 17:56:06,066 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:06,066 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10dbd7f10>
+2024-09-29 17:56:10,754 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:10,754 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e1b2fd0>
+2024-09-29 17:56:12,767 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:12,767 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e121bd0>
+2024-09-29 17:56:21,950 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:21,951 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e1c2e10>
+2024-09-29 17:56:23,217 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:56:23,217 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e1c2210>
+2024-09-29 17:56:24,120 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:24,120 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e1c2850>
+2024-09-29 17:56:25,113 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:56:25,113 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e1c3ad0>
+2024-09-29 17:56:25,696 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:25,697 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e1cc8d0>
+2024-09-29 17:56:26,251 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:56:26,251 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e1cd210>
+2024-09-29 17:56:27,020 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:27,020 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e1ce210>
+2024-09-29 17:56:28,238 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:56:28,239 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e1ce9d0>
+2024-09-29 17:56:29,154 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:29,155 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e1cf590>
+2024-09-29 17:56:30,319 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:56:30,320 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e1d8090>
+2024-09-29 17:56:31,780 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.WORLD_CUP
+2024-09-29 17:56:31,780 - view.main_view - DEBUG - Rendering view strategy: <view.world_cup_view.WorldCupView object at 0x10e1d8e10>
+2024-09-29 17:56:33,192 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:56:33,193 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e1d8250>
+2024-09-29 17:56:40,036 - view.main_view - DEBUG - Sidebar option selected: ViewStrategy.HOME
+2024-09-29 17:56:40,036 - view.main_view - DEBUG - Rendering view strategy: <view.home_view.HomeView object at 0x10e1e8450>
