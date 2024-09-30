@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-
 from view.abstract_streamlit_view import AbstractStreamlitView
-
 from enum import Enum
 
 class ViewStrategy(Enum):

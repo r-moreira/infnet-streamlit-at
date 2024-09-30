@@ -17,7 +17,7 @@ class SidebarView(AbstractStreamlitView):
                 options=[e.value for e in ViewStrategy], 
                 icons=[
                     'house',
-                    'gear'
+                    'globe2'
                 ], 
                 menu_icon="cast", 
                 default_index=0

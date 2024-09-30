@@ -1,6 +1,9 @@
 import logging
 from dependency_injector import containers, providers
 from dependency_injector.wiring import Provide, inject
+from repository.statsbomb_repository import StatsBombRepository
+from service.session_state_service import SessionStateService
+from view.abstract_streamlit_view import AbstractStreamlitView
 from view.home_view import HomeView
 from view.main_view import MainView
 from view.sidebar_view import SidebarView
@@ -8,9 +11,17 @@ from view.world_cup_view import WorldCupView
 
 
 class Container(containers.DeclarativeContainer):        
+    session_state_service = providers.Singleton(SessionStateService)
+    
+    statsbomb_repository = providers.Singleton(StatsBombRepository)
+    
     view_strategy_list = providers.List(   
         providers.Singleton(HomeView),
-        providers.Singleton(WorldCupView)
+        providers.Singleton(
+            WorldCupView,
+            statsbomb_repository=statsbomb_repository,
+            session_state_service=session_state_service
+        )
     )
     
     main_view = providers.Singleton(
@@ -20,7 +31,7 @@ class Container(containers.DeclarativeContainer):
     )
 
 @inject
-def main(main_view: MainView = Provide[Container.main_view]) -> None:
+def main(main_view: AbstractStreamlitView = Provide[Container.main_view]) -> None:
     main_view.render()
 
 

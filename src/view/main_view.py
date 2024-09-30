@@ -17,8 +17,8 @@ class MainView(AbstractStreamlitView):
         
     def render(self) -> None:
         st.set_page_config(
-            page_title="World Cup App",
-            page_icon="🌐",
+            page_title="Soccer Analysis App",
+            page_icon="⚽",
             layout="wide",
         )
         

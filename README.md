@@ -3,7 +3,10 @@
 ### Aluno: Rodrigo Moreira Avila
 
 
-### Aviso ao professor:
+### Avisos ao professor:
+Eu preferi criar meu próprio sistema de páginas ao invés de usar o nativo do streamlit, que utiliza o diretório pages.
+
+Escolhi usar os dados de copa do mundo, pois foram os dados que achei com o maior número de temporadas
 
 
 ### Sobre o projeto:
