@@ -47,11 +47,14 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         team_name = SelectBoxes.team_select(matches)
         team_matches = self.get_cached_team_matches(competition_name, season_name, matches, team_name)
         
-        if menu_option == StatsBombViewMenuOption.TEAM:
+        AbstractStatsBombView.logger.info(f"Menu option selected: {menu_option}")
+      
+        
+        if menu_option == StatsBombViewMenuOption.TEAM.value:
             self.team_fragment()
-        elif menu_option == StatsBombViewMenuOption.MATCH:
+        elif menu_option == StatsBombViewMenuOption.MATCH.value:
             self.match_fragment(team_matches)
-        elif menu_option == StatsBombViewMenuOption.PLAYER:
+        elif menu_option == StatsBombViewMenuOption.PLAYER.value:
             self.player_fragment() 
 
     def option_menu_fragment(self):
