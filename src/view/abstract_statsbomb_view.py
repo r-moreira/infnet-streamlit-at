@@ -48,16 +48,15 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         team_matches = self.get_cached_team_matches(competition_name, season_name, matches, team_name)
         
         AbstractStatsBombView.logger.info(f"Menu option selected: {menu_option}")
-      
         
-        if menu_option == StatsBombViewMenuOption.TEAM.value:
+        if menu_option == StatsBombViewMenuOption.TEAM:
             self.team_fragment()
-        elif menu_option == StatsBombViewMenuOption.MATCH.value:
+        elif menu_option == StatsBombViewMenuOption.MATCH:
             self.match_fragment(team_matches)
-        elif menu_option == StatsBombViewMenuOption.PLAYER.value:
+        elif menu_option == StatsBombViewMenuOption.PLAYER:
             self.player_fragment() 
 
-    def option_menu_fragment(self):
+    def option_menu_fragment(self) -> StatsBombViewMenuOption:
         menu_index = 0
         if self.session_state_service.is_view_menu_option():
             menu_index = StatsBombViewMenuOption.to_list().index(self.session_state_service.get_view_menu_option())
@@ -69,11 +68,11 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             menu_icon="cast",            
             default_index=menu_index,
             orientation="horizontal",
-            key="world_cups_view_menu"
+            key=f"{self.get_title()}_view_menu"
         )
         
         self.session_state_service.set_view_menu_option(menu_option)
-        return menu_option
+        return StatsBombViewMenuOption(menu_option)
 
     def team_fragment(self) -> None:
         st.write("In Progress")

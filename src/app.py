@@ -11,9 +11,7 @@ from view.sidebar_view import SidebarView
 from view.word_cups_view import WordCupsView
 
 
-class Container(containers.DeclarativeContainer):        
-    session_state_service = providers.Singleton(SessionStateService)
-    
+class Container(containers.DeclarativeContainer):      
     statsbomb_repository = providers.Singleton(StatsBombRepository)
     
     view_strategy_list = providers.List(   
@@ -21,12 +19,18 @@ class Container(containers.DeclarativeContainer):
         providers.Singleton(
             WordCupsView,
             statsbomb_repository=statsbomb_repository,
-            session_state_service=session_state_service
+            session_state_service=providers.Factory(
+                SessionStateService,
+                states_prefix='world_cups_view'
+            )
         ),
         providers.Singleton(
             CompetitionsView,
             statsbomb_repository=statsbomb_repository,
-            session_state_service=session_state_service
+            session_state_service=providers.Factory(
+                SessionStateService,
+                states_prefix='competitions_view'
+            )
         )
     )
     
