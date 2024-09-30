@@ -1,8 +1,9 @@
 import logging
 from typing import List
 import streamlit as st
+from enums.view_strategy import ViewStrategy
 from view.abstract_streamlit_view import AbstractStreamlitView
-from view.abstract_view_strategy import AbstractViewStrategy, ViewStrategy
+from view.abstract_view_strategy import AbstractViewStrategy
 
 class MainView(AbstractStreamlitView):
     logger = logging.getLogger(__name__)

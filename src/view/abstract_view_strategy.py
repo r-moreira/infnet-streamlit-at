@@ -1,10 +1,5 @@
 from abc import ABC, abstractmethod
-from enum import Enum
-
-class ViewStrategy(Enum):
-    HOME = "Home"
-    WORLD_CUPS = "World Cups"
-    COMPETITIONS = "Competitions"
+from enums.view_strategy import ViewStrategy
 
 class AbstractViewStrategy(ABC):
     
