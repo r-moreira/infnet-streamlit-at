@@ -9,13 +9,15 @@ class StatsBombRepository:
     def get_competitions(self) -> DataFrame:
         return sb.competitions()
     
-    def get_competition(self, competition_name: str) -> DataFrame:
-        competitions = self.get_competitions()
+    def get_matches(
+            self,
+            competition_name: str,
+            season_name: str,
+            competition: DataFrame | None = None
+        ) -> DataFrame:
         
-        return competitions[competitions["competition_name"] == competition_name]
-    
-    def get_matches(self, competition_name: str, season_name: str) -> DataFrame:
-        competition = self.get_competition(competition_name)
+        if competition is None:
+            competition = self.get_competition(competition_name)
         
         season_competitions = competition[competition["season_name"] == season_name]
         
@@ -24,8 +26,16 @@ class StatsBombRepository:
             season_competitions["season_id"].values[0]
         )
     
-    def get_team_matches(self, competition_name: str, season_name: str, team_name: str) -> DataFrame:
-        matches = self.get_matches(competition_name, season_name)
+    def get_team_matches(
+            self,
+            competition_name: str, 
+            season_name: str,
+            team_name: str,
+            matches: DataFrame | None = None
+        ) -> DataFrame:
+        
+        if matches is None:
+            matches = self.get_matches(competition_name, season_name)
         
         team_matches = matches[
             (matches["home_team"] == team_name) | (matches["away_team"] == team_name)
@@ -39,7 +49,12 @@ class StatsBombRepository:
         
         return team_matches
     
-    def get_team_match(self, team_matches: DataFrame, match_option: str) -> Dict:
+    def get_team_match(
+            self,
+            team_matches: DataFrame,
+            match_option: str
+        ) -> Dict:
+        
         match_id = team_matches[team_matches["match_option"] == match_option]["match_id"].values[0]
         
         match = team_matches[team_matches["match_id"] == match_id]

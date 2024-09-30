@@ -7,7 +7,7 @@ from view.abstract_streamlit_view import AbstractStreamlitView
 from view.home_view import HomeView
 from view.main_view import MainView
 from view.sidebar_view import SidebarView
-from view.world_cup_view import WorldCupView
+from view.world_cups_view import WorldCupsView
 
 
 class Container(containers.DeclarativeContainer):        
@@ -18,7 +18,7 @@ class Container(containers.DeclarativeContainer):
     view_strategy_list = providers.List(   
         providers.Singleton(HomeView),
         providers.Singleton(
-            WorldCupView,
+            WorldCupsView,
             statsbomb_repository=statsbomb_repository,
             session_state_service=session_state_service
         )
@@ -37,7 +37,7 @@ def main(main_view: AbstractStreamlitView = Provide[Container.main_view]) -> Non
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=logging.INFO,
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
         handlers=[
             logging.FileHandler("app.log"),

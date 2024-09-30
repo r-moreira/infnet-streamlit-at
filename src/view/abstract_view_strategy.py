@@ -4,7 +4,8 @@ from enum import Enum
 
 class ViewStrategy(Enum):
     HOME = "Home"
-    WORLD_CUP = "World Cup"
+    WORLD_CUPS = "World Cups"
+    COMPETITIONS = "Competitions"
 
 class AbstractViewStrategy(AbstractStreamlitView):
     
