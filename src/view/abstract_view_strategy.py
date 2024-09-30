@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Any
-from view.abstract_streamlit_view import AbstractStreamlitView
 from enum import Enum
 
 class ViewStrategy(Enum):
@@ -8,12 +6,8 @@ class ViewStrategy(Enum):
     WORLD_CUPS = "World Cups"
     COMPETITIONS = "Competitions"
 
-class AbstractViewStrategy(AbstractStreamlitView):
+class AbstractViewStrategy(ABC):
     
     @abstractmethod
     def accept(self, view_strategy: ViewStrategy) -> bool:
-        pass
-    
-    @abstractmethod
-    def render(self, *args: Any, **kwargs: Any) -> None | Any:
         pass

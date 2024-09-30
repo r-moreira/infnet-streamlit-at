@@ -7,37 +7,16 @@ from pandas import DataFrame
 from components.selectboxes import SelectBoxes
 from repository.statsbomb_repository import StatsBombRepository
 from service.session_state_service import SessionStateService
+from view.abstract_streamlit_view import AbstractStreamlitView
 from view.abstract_view_strategy import AbstractViewStrategy, ViewStrategy
+from enums.statsbomb_view_menu_option import StatsBombViewMenuOption
 import streamlit as st
 from streamlit_option_menu import option_menu
 
 
-class AbstractStatsBombView(AbstractViewStrategy):
+class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     logger = logging.getLogger(__name__)
-    
-    class MenuOption(Enum):
-        TEAM = "Team"
-        MATCH = "Match"
-        PLAYER = "Player"
-    
-        def to_list() -> List:
-           return [e.value for e in AbstractStatsBombView.MenuOption]
-    
-    class State:
-        @staticmethod
-        def set_view_menu_option(menu_option: str) -> None:
-            if menu_option not in AbstractStatsBombView.MenuOption.to_list():
-                raise ValueError(f"Invalid menu option: {menu_option}")
 
-            st.session_state['world_cups_view_menu_option'] = menu_option
-            
-        @staticmethod
-        def get_view_menu_option() -> str:
-            if 'world_cups_view_menu_option' not in st.session_state:
-                AbstractStatsBombView.State.set_view_menu_option(AbstractStatsBombView.MenuOption.TEAM.value)
-            
-            return st.session_state['world_cups_view_menu_option']
-    
     def __init__(
             self,
             statsbomb_repository: StatsBombRepository,
@@ -68,21 +47,21 @@ class AbstractStatsBombView(AbstractViewStrategy):
         team_name = SelectBoxes.team_select(matches)
         team_matches = self.get_cached_team_matches(competition_name, season_name, matches, team_name)
         
-        if menu_option == self.MenuOption.TEAM:
+        if menu_option == StatsBombViewMenuOption.TEAM:
             self.team_fragment()
-        elif menu_option == self.MenuOption.MATCH:
+        elif menu_option == StatsBombViewMenuOption.MATCH:
             self.match_fragment(team_matches)
-        elif menu_option == self.MenuOption.PLAYER:
+        elif menu_option == StatsBombViewMenuOption.PLAYER:
             self.player_fragment() 
 
     def option_menu_fragment(self):
         menu_index = 0
-        if 'world_cups_view_menu_option' in st.session_state:
-            menu_index = self.MenuOption.to_list().index(self.State.get_view_menu_option())
+        if self.session_state_service.is_view_menu_option():
+            menu_index = StatsBombViewMenuOption.to_list().index(self.session_state_service.get_view_menu_option())
 
         menu_option = option_menu(
             None, 
-            options=self.MenuOption.to_list(), 
+            options=StatsBombViewMenuOption.to_list(), 
             icons=['house', 'cloud-upload', "list-task"], 
             menu_icon="cast",            
             default_index=menu_index,
@@ -90,7 +69,7 @@ class AbstractStatsBombView(AbstractViewStrategy):
             key="world_cups_view_menu"
         )
         
-        self.State.set_view_menu_option(menu_option)
+        self.session_state_service.set_view_menu_option(menu_option)
         return menu_option
 
     def team_fragment(self) -> None:
