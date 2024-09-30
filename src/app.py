@@ -4,10 +4,11 @@ from dependency_injector.wiring import Provide, inject
 from repository.statsbomb_repository import StatsBombRepository
 from service.session_state_service import SessionStateService
 from view.abstract_streamlit_view import AbstractStreamlitView
+from view.competitions_view import CompetitionsView
 from view.home_view import HomeView
 from view.main_view import MainView
 from view.sidebar_view import SidebarView
-from view.world_cups_view import WorldCupsView
+from view.word_cups_view import WordCupsView
 
 
 class Container(containers.DeclarativeContainer):        
@@ -18,7 +19,12 @@ class Container(containers.DeclarativeContainer):
     view_strategy_list = providers.List(   
         providers.Singleton(HomeView),
         providers.Singleton(
-            WorldCupsView,
+            WordCupsView,
+            statsbomb_repository=statsbomb_repository,
+            session_state_service=session_state_service
+        ),
+        providers.Singleton(
+            CompetitionsView,
             statsbomb_repository=statsbomb_repository,
             session_state_service=session_state_service
         )

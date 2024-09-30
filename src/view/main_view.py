@@ -24,11 +24,11 @@ class MainView(AbstractStreamlitView):
         
         sidebar_option: ViewStrategy = self.sidebar_view.render()
         
-        MainView.logger.debug(f"Sidebar option selected: {sidebar_option}")
+        MainView.logger.info(f"Sidebar option selected: {sidebar_option}")
         
         # Render the view based on the sidebar option @Strategy Pattern
         for view_strategy in self.view_strategy_list:
             if view_strategy.accept(sidebar_option):
-                MainView.logger.debug(f"Rendering view strategy: {view_strategy}")
+                MainView.logger.info(f"Rendering view strategy: {view_strategy}")
                 view_strategy.render()
                 break

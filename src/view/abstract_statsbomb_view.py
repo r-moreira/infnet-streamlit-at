@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from enum import Enum
 import logging
 import time
@@ -11,9 +12,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 
 
-
-#How to preserve session state in Streamlit: https://discuss.streamlit.io/t/multi-page-apps-with-widget-state-preservation-the-simple-way/22303/8
-class WorldCupsView(AbstractViewStrategy):
+class AbstractStatsBombView(AbstractViewStrategy):
     logger = logging.getLogger(__name__)
     
     class MenuOption(Enum):
@@ -22,12 +21,12 @@ class WorldCupsView(AbstractViewStrategy):
         PLAYER = "Player"
     
         def to_list() -> List:
-           return [e.value for e in WorldCupsView.MenuOption]
+           return [e.value for e in AbstractStatsBombView.MenuOption]
     
     class State:
         @staticmethod
         def set_view_menu_option(menu_option: str) -> None:
-            if menu_option not in WorldCupsView.MenuOption.to_list():
+            if menu_option not in AbstractStatsBombView.MenuOption.to_list():
                 raise ValueError(f"Invalid menu option: {menu_option}")
 
             st.session_state['world_cups_view_menu_option'] = menu_option
@@ -35,7 +34,7 @@ class WorldCupsView(AbstractViewStrategy):
         @staticmethod
         def get_view_menu_option() -> str:
             if 'world_cups_view_menu_option' not in st.session_state:
-                WorldCupsView.State.set_view_menu_option(WorldCupsView.MenuOption.TEAM.value)
+                AbstractStatsBombView.State.set_view_menu_option(AbstractStatsBombView.MenuOption.TEAM.value)
             
             return st.session_state['world_cups_view_menu_option']
     
@@ -46,15 +45,24 @@ class WorldCupsView(AbstractViewStrategy):
         ) -> None:
         self.statsbomb_repository = statsbomb_repository
         self.session_state_service = session_state_service
+
+    @abstractmethod
+    def get_competitions_list(self) -> List[str]:
+        pass
     
+    @abstractmethod
     def accept(self, view_strategy: ViewStrategy) -> bool:
-        return view_strategy == ViewStrategy.WORLD_CUPS
+        pass
+    
+    @abstractmethod
+    def get_title(self) -> str:
+        pass
     
     def render(self) -> None:
-        st.title("World Cup Analysis")
+        st.title(self.get_title())
         
         menu_option = self.option_menu_fragment()
-        competitions = self.get_cached_competitions()
+        competitions = self.get_cached_competitions(self.get_competitions_list())
         competition_name, season_name, competition = SelectBoxes.select_competition_and_season(competitions)
         matches = self.get_cached_matches(competition_name, season_name, competition)
         team_name = SelectBoxes.team_select(matches)
@@ -101,18 +109,11 @@ class WorldCupsView(AbstractViewStrategy):
     def player_fragment(self) -> None:
         st.write("In Progress")
         
-    
     @st.cache_data(ttl=3600)
-    def get_cached_competitions(_self):
+    def get_cached_competitions(_self, competitions_list: List[str]):
         competitions = _self.statsbomb_repository.get_competitions()
+        return competitions[competitions['competition_name'].isin(competitions_list)]
         
-        return competitions[competitions['competition_name'].isin([
-            "FIFA U20 World Cup", 
-            "FIFA World Cup", 
-            "Women's World Cup"
-        ])]
-        
-    
     @st.cache_data(ttl=3600)
     def get_cached_team_matches(_self, competition_name, season_name, matches, team_name):
         return _self.statsbomb_repository.get_team_matches(competition_name, season_name, team_name, matches)
