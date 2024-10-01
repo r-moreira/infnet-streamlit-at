@@ -28,14 +28,9 @@ class StatsBombRepository:
     
     def get_team_matches(
             self,
-            competition_name: str, 
-            season_name: str,
             team_name: str,
-            matches: DataFrame | None = None
+            matches: DataFrame
         ) -> DataFrame:
-        
-        if matches is None:
-            matches = self.get_matches(competition_name, season_name)
         
         team_matches = matches[
             (matches["home_team"] == team_name) | (matches["away_team"] == team_name)
@@ -47,7 +42,15 @@ class StatsBombRepository:
             axis=1
         )
         
-        return team_matches
+        return team_matches   
+    
+    def get_team_lineup(
+            self,
+            match_id: int,
+            team_name: str
+        ) -> DataFrame:
+        
+        return sb.lineups(match_id)[team_name]
     
     def get_team_match_info(
             self,
@@ -124,12 +127,4 @@ class StatsBombRepository:
             "total_home_games": total_home_games,
             "total_away_games": total_away_games
         }
-    
-    def get_team_lineup(
-            self,
-            match_id: int,
-            team_name: str
-        ) -> DataFrame:
-        
-        return sb.lineups(match_id)[team_name]
         

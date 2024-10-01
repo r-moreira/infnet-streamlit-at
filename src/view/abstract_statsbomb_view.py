@@ -44,12 +44,14 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     def render(self) -> None:
         st.title(self.get_title())
         
+        add_vertical_space(1)
+        
         menu_option = self.option_menu_fragment()
         competitions = self.get_cached_competitions(self.get_competitions_list())
         competition_name, season_name, competition = SelectBoxes.select_competition_and_season(competitions)
         matches = self.get_cached_matches(competition_name, season_name, competition)
         team_name = SelectBoxes.team_select(matches)
-        team_matches = self.get_cached_team_matches(competition_name, season_name, matches, team_name)
+        team_matches = self.get_cached_team_matches(matches, team_name)
         
         AbstractStatsBombView.logger.info(f"Menu option selected: {menu_option}")
         
@@ -120,24 +122,28 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         match_info, match = self.statsbomb_repository.get_team_match_info(team_matches, team_match_option)
         
-        team_lineup = self.statsbomb_repository.get_team_lineup(match_info["match_id"], team_name)
+        team_lineup = self.get_cached_team_lineup(match_info["match_id"], team_name)
         
         player_name = SelectBoxes.player_select(team_lineup)
         
         st.dataframe(team_lineup)
         
-    @st.cache_data(ttl=3600)
+    @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_competitions(_self, competitions_list: List[str]):
         competitions = _self.statsbomb_repository.get_competitions()
         return competitions[competitions['competition_name'].isin(competitions_list)]
         
-    @st.cache_data(ttl=3600)
-    def get_cached_team_matches(_self, competition_name, season_name, matches, team_name):
-        return _self.statsbomb_repository.get_team_matches(competition_name, season_name, team_name, matches)
+    @st.cache_data(ttl=3600, show_spinner=True)
+    def get_cached_team_matches(_self, matches, team_name):
+        return _self.statsbomb_repository.get_team_matches(team_name, matches)
 
-    @st.cache_data(ttl=3600)
+    @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_matches(_self, competition_name, season_name, competition):
         return _self.statsbomb_repository.get_matches(competition_name, season_name, competition)
+    
+    @st.cache_data(ttl=3600, show_spinner=True)
+    def get_cached_team_lineup(_self, match_id, team_name):
+        return _self.statsbomb_repository.get_team_lineup(match_id, team_name)
     
     def match_plots(self, match_info: Dict) -> None:
         add_vertical_space(2)
@@ -209,7 +215,6 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         fig_radar.update_traces(fill='toself')
         st.markdown(f"<h5 style='text-align: center;'>Team Performance Radar Chart</h5>", unsafe_allow_html=True)
         st.plotly_chart(fig_radar)
-        
         
         col1, col2 = st.columns(2)
         
