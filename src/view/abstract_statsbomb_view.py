@@ -192,12 +192,12 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         st.divider()
         add_vertical_space(2)
         radar_data = {
-            "Metric": ["Total Matches", "Total Wins", "Total Losses", "Total Draws", "Total Goals Scored", "Total Goals Conceded", "Total Home Games", "Total Away Games"],
-            "Value": [team_info["total_matches"], team_info["total_wins"], team_info["total_losses"], team_info["total_draws"], team_info["total_goals_scored"], team_info["total_goals_conceded"], team_info["total_home_games"], team_info["total_away_games"]]
+            "Metric": ["Total Wins", "Total Losses", "Total Draws", "Total Goals Scored", "Total Goals Conceded"],
+            "Value": [team_info["total_wins"], team_info["total_losses"], team_info["total_draws"], team_info["total_goals_scored"], team_info["total_goals_conceded"]]
         }
         radar_df = pd.DataFrame(radar_data)
         fig_radar = px.line_polar(radar_df, r="Value", theta="Metric", line_close=True)
-        
+        fig_radar.update_traces(fill='toself')
         st.markdown(f"<h5 style='text-align: center;'>Team Performance Radar Chart</h5>", unsafe_allow_html=True)
         st.plotly_chart(fig_radar)
         
