@@ -1,9 +1,12 @@
 from abc import abstractmethod
 from enum import Enum
+import json
 import logging
 import time
-from typing import List, Tuple 
+from typing import List, Tuple, Dict 
+import pandas as pd
 from pandas import DataFrame
+import plotly.express as px
 from components.selectboxes import SelectBoxes
 from repository.statsbomb_repository import StatsBombRepository
 from service.session_state_service import SessionStateService
@@ -12,6 +15,7 @@ from view.abstract_view_strategy import AbstractViewStrategy, ViewStrategy
 from enums.statsbomb_view_menu_option import StatsBombViewMenuOption
 import streamlit as st
 from streamlit_option_menu import option_menu
+from streamlit_extras.add_vertical_space import add_vertical_space
 
 
 class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
@@ -50,7 +54,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         AbstractStatsBombView.logger.info(f"Menu option selected: {menu_option}")
         
         if menu_option == StatsBombViewMenuOption.TEAM:
-            self.team_fragment()
+            self.team_fragment(team_name, competition_name, team_matches)
         elif menu_option == StatsBombViewMenuOption.MATCH:
             self.match_fragment(team_matches)
         elif menu_option == StatsBombViewMenuOption.PLAYER:
@@ -74,22 +78,45 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         self.session_state_service.set_view_menu_option(menu_option)
         return StatsBombViewMenuOption(menu_option)
 
-    def team_fragment(self) -> None:
-        st.write("In Progress")
+    def team_fragment(self, team_name: str, competition_name: str, team_matches: DataFrame) -> None:
+        team_info = self.statsbomb_repository.get_team_matches_info(team_name, team_matches)
+                  
+        self.team_plots(team_info, competition_name) 
+        
+        st.divider()
+        
+        st.markdown(f"<h3 style='text-align: center;'>Open Data</h3>", unsafe_allow_html=True)
+        
+        with st.expander("Json", expanded=False):
+            st.write(team_info)
+            st.download_button("Download", json.dumps(team_info, ensure_ascii=False, indent=2), "team_info.json", "application/json")
+        with st.expander("Dataframe", expanded=False):
+            st.dataframe(team_matches)
+            st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv")
+        
 
     def match_fragment(self, team_matches: DataFrame) -> None:
         team_match_option = SelectBoxes.match_select(team_matches)
 
-        match_info = self.statsbomb_repository.get_team_match(team_matches, team_match_option)
+        match_info, match = self.statsbomb_repository.get_team_match_info(team_matches, team_match_option)
         
-        with st.expander("Match Info"):
+        self.match_plots(match_info)     
+        
+        st.divider()
+        
+        st.markdown(f"<h3 style='text-align: center;'>Open Data</h3>", unsafe_allow_html=True)
+        
+        with st.expander("Json", expanded=False):
             st.write(match_info)
-        
-        st.dataframe(team_matches)
+            st.download_button("Download", json.dumps(match_info, ensure_ascii=False, indent=2), "match_info.json", "application/json")
+            
+        with st.expander("Dataframe", expanded=False):
+            st.dataframe(match)
+            st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv") 
         
     def player_fragment(self) -> None:
         st.write("In Progress")
-        
+    
     @st.cache_data(ttl=3600)
     def get_cached_competitions(_self, competitions_list: List[str]):
         competitions = _self.statsbomb_repository.get_competitions()
@@ -101,5 +128,125 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
 
     @st.cache_data(ttl=3600)
     def get_cached_matches(_self, competition_name, season_name, competition):
-        return _self.statsbomb_repository.get_matches(competition_name, season_name, competition)           
+        return _self.statsbomb_repository.get_matches(competition_name, season_name, competition)
+    
+    def match_plots(self, match_info: Dict) -> None:
+        add_vertical_space(2)
+        
+        st.markdown(f"<h3 style='text-align: center;'>{match_info['home_team']} vs {match_info['away_team']}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center;'>At {match_info['stadium']}</h4>", unsafe_allow_html=True)
+        
+        add_vertical_space(2)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Match Date", match_info["match_date"])
             
+        with col2:
+            st.metric("Home Score", match_info["home_score"])
+            
+        with col3:
+            st.metric("Away Score", match_info["away_score"])
+            
+        with col4:
+            st.metric("Total Goals", match_info["home_score"] +  match_info["away_score"])
+            
+            
+    def team_plots(self, team_info: Dict, competition_name: str) -> None:
+        add_vertical_space(2)
+        
+        st.markdown(f"<h3 style='text-align: center;'>{team_info['team_name']} at {competition_name} </h3>", unsafe_allow_html=True)
+        
+        add_vertical_space(2)
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Matches", team_info["total_matches"])
+            
+        with col2:
+            st.metric("Total Wins", team_info["total_wins"])
+            
+        with col3:
+            st.metric("Total Loses", team_info["total_losses"])
+            
+        with col4:
+            st.metric("Total Draws", team_info["total_draws"])
+        
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            st.metric("Total Goals Scored", team_info["total_goals_scored"])
+            
+        with col2:
+            st.metric("Total Goals Conceded", team_info["total_goals_conceded"])
+            
+        with col3:
+            st.metric("Total Home Games", team_info["total_home_games"])
+            
+        with col4:
+            st.metric("Total Away Games", team_info["total_away_games"])
+        
+        
+        st.divider()
+        add_vertical_space(2)
+        radar_data = {
+            "Metric": ["Total Matches", "Total Wins", "Total Losses", "Total Draws", "Total Goals Scored", "Total Goals Conceded", "Total Home Games", "Total Away Games"],
+            "Value": [team_info["total_matches"], team_info["total_wins"], team_info["total_losses"], team_info["total_draws"], team_info["total_goals_scored"], team_info["total_goals_conceded"], team_info["total_home_games"], team_info["total_away_games"]]
+        }
+        radar_df = pd.DataFrame(radar_data)
+        fig_radar = px.line_polar(radar_df, r="Value", theta="Metric", line_close=True)
+        
+        st.markdown(f"<h5 style='text-align: center;'>Team Performance Radar Chart</h5>", unsafe_allow_html=True)
+        st.plotly_chart(fig_radar)
+        
+        
+        col1, col2 = st.columns(2)
+        
+        goals_data = {
+            "Metric": ["Goals Scored", "Goals Conceded"],
+            "Count": [team_info["total_goals_scored"], team_info["total_goals_conceded"]]
+        }
+        goals_df = pd.DataFrame(goals_data)
+        fig_goals_bar = px.bar(goals_df, x="Metric", y="Count", title="Total Goals Scored vs Conceded")
+        fig_goals_pie = px.pie(goals_df, names="Metric", values="Count", title="Goals Distribution")
+        
+        col1.plotly_chart(fig_goals_bar)
+        col2.plotly_chart(fig_goals_pie)
+        
+        results_data = {
+            "Result": ["Wins", "Losses", "Draws"],
+            "Count": [team_info["total_wins"], team_info["total_losses"], team_info["total_draws"]]
+        }
+        results_df = pd.DataFrame(results_data)
+        fig_results_bar = px.bar(results_df, x="Result", y="Count", title="Match Results")
+        fig_results_pie = px.pie(results_df, names="Result", values="Count", title="Results Distribution")
+        
+        col1, col2 = st.columns(2)
+        col1.plotly_chart(fig_results_bar)
+        col2.plotly_chart(fig_results_pie)
+        
+        home_away_data = {
+            "Location": ["Home Games", "Away Games"],
+            "Count": [team_info["total_home_games"], team_info["total_away_games"]]
+        }
+        home_away_df = pd.DataFrame(home_away_data)
+        fig_home_away_bar = px.bar(home_away_df, x="Location", y="Count", title="Home vs Away Games")
+        fig_home_away_pie = px.pie(home_away_df, names="Location", values="Count", title="Home vs Away Distribution")
+        
+        col1, col2 = st.columns(2)
+        col1.plotly_chart(fig_home_away_bar)
+        col2.plotly_chart(fig_home_away_pie)
+        
+        avg_goals_data = {
+            "Metric": ["Average Goals Scored", "Average Goals Conceded"],
+            "Count": [team_info["average_goals_scored"], team_info["average_goals_conceded"]]
+        }
+        avg_goals_df = pd.DataFrame(avg_goals_data)
+        fig_avg_goals_bar = px.bar(avg_goals_df, x="Metric", y="Count", title="Average Goals Scored vs Conceded")
+        fig_avg_goals_pie = px.pie(avg_goals_df, names="Metric", values="Count", title="Average Goals Distribution")
+        
+        col1, col2 = st.columns(2)
+        col1.plotly_chart(fig_avg_goals_bar)
+        col2.plotly_chart(fig_avg_goals_pie)
