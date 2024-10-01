@@ -68,11 +68,11 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     def option_menu_fragment(self) -> StatsBombViewMenuOption:
         menu_index = 0
         if self.session_state_service.is_view_menu_option():
-            menu_index = StatsBombViewMenuOption.to_list().index(self.session_state_service.get_view_menu_option())
+            menu_index = StatsBombViewMenuOption.to_value_list().index(self.session_state_service.get_view_menu_option())
 
         menu_option = option_menu(
             None, 
-            options=StatsBombViewMenuOption.to_list(), 
+            options=StatsBombViewMenuOption.to_value_list(), 
             icons=['people', 'play-circle', "person"], 
             menu_icon="cast",            
             default_index=menu_index,
@@ -92,21 +92,20 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         st.markdown(f"<h3 style='text-align: center;'>Open Data</h3>", unsafe_allow_html=True)
         
-        with st.expander("Json", expanded=False):
-            st.write(team_info)
-            st.download_button("Download", json.dumps(team_info, ensure_ascii=False, indent=2), "team_info.json", "application/json")
-        
         with st.expander("Dataframe", expanded=False):
             st.dataframe(team_matches)
             st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv")
-        
+      
+        with st.expander("Metrics Json", expanded=False):
+            st.write(team_info)
+            st.download_button("Download", json.dumps(team_info, ensure_ascii=False, indent=2), "team_info.json", "application/json") 
 
     def match_fragment(self, team_matches: DataFrame) -> None:
         team_match_option = SelectBoxes.match_select(team_matches)
         
         match_info, match = self.statsbomb_repository.get_team_match_info(team_matches, team_match_option)
         
-        events_dict = self.statsbomb_repository.get_split_match_events(match_info["match_id"])
+        events_dict = self.get_cached_split_match_events(match_info["match_id"])
 
         events_info = self.statsbomb_repository.get_match_events_info(events_dict)
         
@@ -116,13 +115,32 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         st.markdown(f"<h3 style='text-align: center;'>Open Data</h3>", unsafe_allow_html=True)
         
-        with st.expander("Json", expanded=False):
+       
+        with st.expander("Events Dataframe", expanded=True):
+            selected_event = st.selectbox("Event", MatchEvent.to_value_list(), index=2)
+        
+            event = self.statsbomb_repository.get_match_event(
+                match_info["match_id"], 
+                MatchEvent(selected_event),
+                events_dict
+            )
+        
+            selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
+            
+            st.dataframe(event[selected_columns]) 
+            st.download_button("Download", event[selected_columns].to_csv(), "match_events.csv", "text/csv")
+        
+        with st.expander("Match Dataframe", expanded=False):
+            st.dataframe(match)
+            st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv") 
+            
+        with st.expander("Match Metrics Json", expanded=False):
             st.write(match_info)
             st.download_button("Download", json.dumps(match_info, ensure_ascii=False, indent=2), "match_info.json", "application/json")
             
-        with st.expander("Dataframe", expanded=False):
-            st.dataframe(match)
-            st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv") 
+        with st.expander("Events Metrics Json", expanded=False):
+            st.write(events_info)
+            st.download_button("Download", json.dumps(events_info, ensure_ascii=False, indent=2), "events_info.json", "application/json")
         
     def player_fragment(self, team_name: str, team_matches: DataFrame) -> None:
         team_match_option = SelectBoxes.match_select(team_matches)
@@ -155,6 +173,10 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_match_event(_self, match_id: int, match_event: MatchEvent) -> DataFrame:
         return _self.statsbomb_repository.get_match_event(match_id, match_event)
+    
+    @st.cache_data(ttl=3600, show_spinner=True)
+    def get_cached_split_match_events(_self, match_id: int) -> Dict[str, DataFrame]:
+        return _self.statsbomb_repository.get_split_match_events(match_id)
     
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_match_events(_self, match_id: int) -> DataFrame:

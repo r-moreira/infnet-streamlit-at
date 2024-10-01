@@ -9,7 +9,7 @@ class SessionStateService:
         
     def set_view_menu_option(self, menu_option: str) -> None:
         print(f"menu_option: {self.prefixed_view_menu_option}")
-        if menu_option not in StatsBombViewMenuOption.to_list():
+        if menu_option not in StatsBombViewMenuOption.to_value_list():
             raise ValueError(f"Invalid menu option: {menu_option}")
 
         st.session_state[self.prefixed_view_menu_option] = menu_option

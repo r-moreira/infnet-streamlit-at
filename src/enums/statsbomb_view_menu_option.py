@@ -7,5 +7,5 @@ class StatsBombViewMenuOption(Enum):
     MATCH = "Match"
     PLAYER = "Player"
 
-    def to_list() -> List:
+    def to_value_list() -> List:
         return [e.value for e in StatsBombViewMenuOption]

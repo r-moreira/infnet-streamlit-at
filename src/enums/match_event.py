@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import List
 
 
 class MatchEvent(Enum):
@@ -29,3 +30,6 @@ class MatchEvent(Enum):
     BAD_BEHAVIOURS = 'bad_behaviours'
     TACTICAL_SHIFTS = 'tactical_shifts'
     FIFTY_FIFTYS = '50/50s'
+    
+    def to_value_list() -> List:
+        return [e.value for e in MatchEvent]
