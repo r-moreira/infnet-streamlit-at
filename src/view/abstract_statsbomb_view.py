@@ -191,7 +191,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         add_vertical_space(2)
         
-        col1, col2, col3, col4 = st.columns(4)
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
                     
         with col1:
             st.metric(f"{match_info['home_team']} Score", match_info["home_score"])
@@ -206,7 +206,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             st.metric("Total Shots", events_info["total_shots"])
             
         
-        col1, col2, col3, col4 = st.columns(4)
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
                     
         with col1:
             st.metric("Total Passes", events_info["total_passes"])
@@ -228,7 +228,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         add_vertical_space(2)
         
-        col1, col2, col3, col4 = st.columns(4)
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
         
         with col1:
             st.metric("Total Matches", team_info["total_matches"])
@@ -242,7 +242,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         with col4:
             st.metric("Total Draws", team_info["total_draws"])
         
-        col1, col2, col3, col4 = st.columns(4)
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
         
         with col1:
             st.metric("Total Goals Scored", team_info["total_goals_scored"])
