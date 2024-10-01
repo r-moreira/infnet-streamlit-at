@@ -27,7 +27,8 @@ class SidebarView(AbstractStreamlitView):
                 icons=[
                     'house',
                     'globe2',
-                    'trophy'
+                    'trophy',
+                    'flag',
                 ], 
                 menu_icon="cast", 
                 default_index=0

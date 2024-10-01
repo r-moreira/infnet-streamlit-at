@@ -4,7 +4,8 @@ from dependency_injector.wiring import Provide, inject
 from repository.statsbomb_repository import StatsBombRepository
 from service.session_state_service import SessionStateService
 from view.abstract_streamlit_view import AbstractStreamlitView
-from view.competitions_view import CompetitionsView
+from view.international_competitions_view import InternationalCompetitionsView
+from view.national_competitions_view import NationalCompetitionsView
 from view.home_view import HomeView
 from view.main_view import MainView
 from view.sidebar_view import SidebarView
@@ -25,13 +26,21 @@ class Container(containers.DeclarativeContainer):
             )
         ),
         providers.Singleton(
-            CompetitionsView,
+            NationalCompetitionsView,
             statsbomb_repository=statsbomb_repository,
             session_state_service=providers.Factory(
                 SessionStateService,
-                states_prefix='competitions_view'
+                states_prefix='national_competitions_view'
             )
-        )
+        ),
+        providers.Singleton(
+            InternationalCompetitionsView,
+            statsbomb_repository=statsbomb_repository,
+            session_state_service=providers.Factory(
+                SessionStateService,
+                states_prefix='international_competitions_view'
+            ) 
+        )           
     )
     
     main_view = providers.Singleton(
