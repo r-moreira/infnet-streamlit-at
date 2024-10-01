@@ -92,7 +92,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         st.markdown(f"<h3 style='text-align: center;'>Open Data</h3>", unsafe_allow_html=True)
         
-        with st.expander("Dataframe", expanded=False):
+        with st.expander("Matches Dataframe", expanded=False):
             st.dataframe(team_matches)
             st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv")
       
@@ -194,10 +194,10 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         col1, col2, col3, col4 = st.columns(4)
                     
         with col1:
-            st.metric("Home Score", match_info["home_score"])
+            st.metric(f"{match_info['home_team']} Score", match_info["home_score"])
             
         with col2:
-            st.metric("Away Score", match_info["away_score"])
+            st.metric(f"{match_info['away_team']} Score", match_info["away_score"])
             
         with col3:
             st.metric("Total Goals", match_info["home_score"] +  match_info["away_score"])
