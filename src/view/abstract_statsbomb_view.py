@@ -70,7 +70,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         menu_option = option_menu(
             None, 
             options=StatsBombViewMenuOption.to_list(), 
-            icons=['house', 'cloud-upload', "list-task"], 
+            icons=['people', 'play-circle', "person"], 
             menu_icon="cast",            
             default_index=menu_index,
             orientation="horizontal",
