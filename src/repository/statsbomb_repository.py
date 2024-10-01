@@ -1,6 +1,9 @@
-from typing import Dict, Tuple
+from typing import Dict, Literal, Tuple
 from pandas import DataFrame
+import pandas as pd
 from statsbombpy import sb
+
+from enums.match_event import MatchEvent
 
 class StatsBombRepository:
     def __init__(self):
@@ -51,6 +54,41 @@ class StatsBombRepository:
         ) -> DataFrame:
         
         return sb.lineups(match_id)[team_name]
+    
+    def get_match_event(
+            self,
+            match_id: int,
+            match_event: MatchEvent,
+            split_events_dict: Dict[str, DataFrame] | None = None
+        ) -> DataFrame:
+        events_dataframe_dict = pd.DataFrame()
+        
+        if split_events_dict is not None:
+            events_dataframe_dict = split_events_dict
+        else:
+            events_dataframe_dict = sb.events(match_id=match_id, split=True, flatten_attrs=False)
+        
+        event_types = events_dataframe_dict.keys()
+        
+        if match_event.value not in event_types:
+            raise ValueError(f"Event type {match_event.value} not found in the match {match_id}")
+        
+        return events_dataframe_dict[match_event.value]
+    
+    def get_split_match_events(
+            self,
+            match_id: int
+        ) -> Dict[str, DataFrame]:
+        
+        return sb.events(match_id=match_id, split=True, flatten_attrs=False)
+    
+    
+    def get_match_events(
+            self,
+            match_id: int
+        ) -> DataFrame:
+        
+        return sb.events(match_id)
     
     def get_team_match_info(
             self,
@@ -126,5 +164,14 @@ class StatsBombRepository:
             "average_goals_conceded": average_goals_conceded,
             "total_home_games": total_home_games,
             "total_away_games": total_away_games
+        }
+    
+    def get_match_events_info(self, split_events_dict: Dict[str, DataFrame]) -> Dict:
+        return {
+            "total_passes": len(split_events_dict[MatchEvent.PASSES.value]),
+            "total_shots": len(split_events_dict[MatchEvent.SHOTS.value]),
+            "total_dribbles": len(split_events_dict[MatchEvent.DRIBBLES.value]),
+            "total_blocks": len(split_events_dict[MatchEvent.BLOCKS.value]),
+            "total_duels": len(split_events_dict[MatchEvent.DUELS.value]),
         }
         

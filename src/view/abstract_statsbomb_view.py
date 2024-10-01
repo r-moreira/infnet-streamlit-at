@@ -8,6 +8,7 @@ import pandas as pd
 from pandas import DataFrame
 import plotly.express as px
 from components.selectboxes import SelectBoxes
+from enums.match_event import MatchEvent
 from repository.statsbomb_repository import StatsBombRepository
 from service.session_state_service import SessionStateService
 from view.abstract_streamlit_view import AbstractStreamlitView
@@ -17,7 +18,9 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_extras.add_vertical_space import add_vertical_space
 
-
+# TODO: Obter dados dos eventos de partidas e jogadores do StatsBomb
+# TODO: Criar visualizações com os dados de eventos obtidos
+# TODO: Criar visualizações com a biblioteca MPLSoccer
 class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     logger = logging.getLogger(__name__)
 
@@ -100,10 +103,14 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
 
     def match_fragment(self, team_matches: DataFrame) -> None:
         team_match_option = SelectBoxes.match_select(team_matches)
-
+        
         match_info, match = self.statsbomb_repository.get_team_match_info(team_matches, team_match_option)
         
-        self.match_plots(match_info)     
+        events_dict = self.statsbomb_repository.get_split_match_events(match_info["match_id"])
+
+        events_info = self.statsbomb_repository.get_match_events_info(events_dict)
+        
+        self.match_plots(match_info, events_info)     
         
         st.divider()
         
@@ -129,43 +136,67 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         st.dataframe(team_lineup)
         
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_competitions(_self, competitions_list: List[str]):
+    def get_cached_competitions(_self, competitions_list: List[str]) -> DataFrame:
         competitions = _self.statsbomb_repository.get_competitions()
         return competitions[competitions['competition_name'].isin(competitions_list)]
         
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_team_matches(_self, matches, team_name):
+    def get_cached_team_matches(_self, matches: DataFrame, team_name: str) -> DataFrame:
         return _self.statsbomb_repository.get_team_matches(team_name, matches)
 
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_matches(_self, competition_name, season_name, competition):
+    def get_cached_matches(_self, competition_name: str, season_name: str, competition: str) -> DataFrame:
         return _self.statsbomb_repository.get_matches(competition_name, season_name, competition)
     
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_team_lineup(_self, match_id, team_name):
+    def get_cached_team_lineup(_self, match_id: int, team_name: str) -> DataFrame:
         return _self.statsbomb_repository.get_team_lineup(match_id, team_name)
     
-    def match_plots(self, match_info: Dict) -> None:
+    @st.cache_data(ttl=3600, show_spinner=True)
+    def get_cached_match_event(_self, match_id: int, match_event: MatchEvent) -> DataFrame:
+        return _self.statsbomb_repository.get_match_event(match_id, match_event)
+    
+    @st.cache_data(ttl=3600, show_spinner=True)
+    def get_cached_match_events(_self, match_id: int) -> DataFrame:
+        return _self.statsbomb_repository.get_match_events(match_id)
+    
+    
+    def match_plots(self, match_info: Dict, events_info: Dict) -> None:
         add_vertical_space(2)
         
         st.markdown(f"<h3 style='text-align: center;'>{match_info['home_team']} vs {match_info['away_team']}</h3>", unsafe_allow_html=True)
-        st.markdown(f"<h4 style='text-align: center;'>At {match_info['stadium']}</h4>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center;'> At {match_info['stadium']} - {match_info['match_date']}</h4>", unsafe_allow_html=True)
         
         add_vertical_space(2)
         
         col1, col2, col3, col4 = st.columns(4)
-        
+                    
         with col1:
-            st.metric("Match Date", match_info["match_date"])
-            
-        with col2:
             st.metric("Home Score", match_info["home_score"])
             
-        with col3:
+        with col2:
             st.metric("Away Score", match_info["away_score"])
             
-        with col4:
+        with col3:
             st.metric("Total Goals", match_info["home_score"] +  match_info["away_score"])
+        
+        with col4:
+            st.metric("Total Shots", events_info["total_shots"])
+            
+        
+        col1, col2, col3, col4 = st.columns(4)
+                    
+        with col1:
+            st.metric("Total Passes", events_info["total_passes"])
+        
+        with col2:
+            st.metric("Total Dribbles", events_info["total_dribbles"])
+            
+        with col3:
+            st.metric("Total Blocks", events_info["total_blocks"])
+            
+        with col4:
+            st.metric("Total Duels", events_info["total_duels"])
             
             
     def team_plots(self, team_info: Dict, competition_name: str) -> None:
