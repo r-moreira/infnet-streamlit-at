@@ -20,7 +20,7 @@ class MainView(AbstractStreamlitView):
         st.set_page_config(
             page_title="Soccer Analysis App",
             page_icon="⚽",
-            layout="wide",
+            layout="centered",
         )
         
         sidebar_option: ViewStrategy = self.sidebar_view.render()

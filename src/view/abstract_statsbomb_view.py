@@ -151,7 +151,16 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         player_name = SelectBoxes.player_select(team_lineup)
         
-        st.dataframe(team_lineup)
+        #st.dataframe(team_lineup)
+        
+        selected_event = st.selectbox("Event", MatchEvent.to_value_list(), index=2)
+        
+        event = self.get_cached_player_event(match_info, player_name, selected_event)
+        
+        selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
+            
+        st.dataframe(event[selected_columns]) 
+        st.download_button("Download", event[selected_columns].to_csv(), "match_events.csv", "text/csv")
         
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_competitions(_self, competitions_list: List[str]) -> DataFrame:
@@ -182,6 +191,13 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     def get_cached_match_events(_self, match_id: int) -> DataFrame:
         return _self.statsbomb_repository.get_match_events(match_id)
     
+    @st.cache_data(ttl=3600, show_spinner=True)
+    def get_cached_player_event(_self, match_info, player_name, selected_event):
+        return _self.statsbomb_repository.get_player_event(
+            match_info["match_id"], 
+            player_name,
+            MatchEvent(selected_event)
+        )
     
     def match_plots(self, match_info: Dict, events_info: Dict) -> None:
         add_vertical_space(2)
@@ -220,7 +236,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         with col4:
             st.metric("Total Duels", events_info["total_duels"])
             
-            
+                
     def team_plots(self, team_info: Dict, competition_name: str) -> None:
         add_vertical_space(2)
         
@@ -231,30 +247,30 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
         
         with col1:
-            st.metric("Total Matches", team_info["total_matches"])
+            st.metric("Matches", team_info["total_matches"])
             
         with col2:
-            st.metric("Total Wins", team_info["total_wins"])
+            st.metric("Wins", team_info["total_wins"])
             
         with col3:
-            st.metric("Total Loses", team_info["total_losses"])
+            st.metric("Loses", team_info["total_losses"])
             
         with col4:
-            st.metric("Total Draws", team_info["total_draws"])
+            st.metric("Draws", team_info["total_draws"])
         
         _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
         
         with col1:
-            st.metric("Total Goals Scored", team_info["total_goals_scored"])
+            st.metric("Goals Scored", team_info["total_goals_scored"])
             
         with col2:
-            st.metric("Total Goals Conceded", team_info["total_goals_conceded"])
+            st.metric("Goals Conceded", team_info["total_goals_conceded"])
             
         with col3:
-            st.metric("Total Home Games", team_info["total_home_games"])
+            st.metric("Home Games", team_info["total_home_games"])
             
         with col4:
-            st.metric("Total Away Games", team_info["total_away_games"])
+            st.metric("Away Games", team_info["total_away_games"])
         
         
         st.divider()

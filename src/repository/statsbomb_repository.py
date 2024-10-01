@@ -55,6 +55,20 @@ class StatsBombRepository:
         
         return sb.lineups(match_id)[team_name]
     
+    def get_match_events(
+            self,
+            match_id: int
+        ) -> DataFrame:
+        
+        return sb.events(match_id)
+    
+    def get_split_match_events(
+            self,
+            match_id: int
+        ) -> Dict[str, DataFrame]:
+        
+        return sb.events(match_id=match_id, split=True, flatten_attrs=False)   
+    
     def get_match_event(
             self,
             match_id: int,
@@ -66,29 +80,19 @@ class StatsBombRepository:
         if split_events_dict is not None:
             events_dataframe_dict = split_events_dict
         else:
-            events_dataframe_dict = sb.events(match_id=match_id, split=True, flatten_attrs=False)
-        
-        event_types = events_dataframe_dict.keys()
-        
-        if match_event.value not in event_types:
-            raise ValueError(f"Event type {match_event.value} not found in the match {match_id}")
+            events_dataframe_dict = self.get_split_match_events(match_id)
         
         return events_dataframe_dict[match_event.value]
     
-    def get_split_match_events(
+    def get_player_event(
             self,
-            match_id: int
-        ) -> Dict[str, DataFrame]:
-        
-        return sb.events(match_id=match_id, split=True, flatten_attrs=False)
-    
-    
-    def get_match_events(
-            self,
-            match_id: int
+            match_id: int,
+            player_name: str,
+            match_event: MatchEvent,
         ) -> DataFrame:
         
-        return sb.events(match_id)
+        match_event = self.get_match_event(match_id, match_event)
+        return match_event[match_event["player"] == player_name]
     
     def get_team_match_info(
             self,
