@@ -124,4 +124,12 @@ class StatsBombRepository:
             "total_home_games": total_home_games,
             "total_away_games": total_away_games
         }
+    
+    def get_team_lineup(
+            self,
+            match_id: int,
+            team_name: str
+        ) -> DataFrame:
+        
+        return sb.lineups(match_id)[team_name]
         

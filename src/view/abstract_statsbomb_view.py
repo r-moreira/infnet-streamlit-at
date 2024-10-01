@@ -58,7 +58,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         elif menu_option == StatsBombViewMenuOption.MATCH:
             self.match_fragment(team_matches)
         elif menu_option == StatsBombViewMenuOption.PLAYER:
-            self.player_fragment() 
+            self.player_fragment(team_name, team_matches) 
 
     def option_menu_fragment(self) -> StatsBombViewMenuOption:
         menu_index = 0
@@ -90,6 +90,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         with st.expander("Json", expanded=False):
             st.write(team_info)
             st.download_button("Download", json.dumps(team_info, ensure_ascii=False, indent=2), "team_info.json", "application/json")
+        
         with st.expander("Dataframe", expanded=False):
             st.dataframe(team_matches)
             st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv")
@@ -114,9 +115,17 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             st.dataframe(match)
             st.download_button("Download", team_matches.to_csv(), "team_matches.csv", "text/csv") 
         
-    def player_fragment(self) -> None:
-        st.write("In Progress")
-    
+    def player_fragment(self, team_name: str, team_matches: DataFrame) -> None:
+        team_match_option = SelectBoxes.match_select(team_matches)
+        
+        match_info, match = self.statsbomb_repository.get_team_match_info(team_matches, team_match_option)
+        
+        team_lineup = self.statsbomb_repository.get_team_lineup(match_info["match_id"], team_name)
+        
+        player_name = SelectBoxes.player_select(team_lineup)
+        
+        st.dataframe(team_lineup)
+        
     @st.cache_data(ttl=3600)
     def get_cached_competitions(_self, competitions_list: List[str]):
         competitions = _self.statsbomb_repository.get_competitions()
