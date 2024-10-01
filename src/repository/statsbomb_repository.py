@@ -29,24 +29,6 @@ class StatsBombRepository:
             season_competitions["season_id"].values[0]
         )
     
-    def get_team_matches(
-            self,
-            team_name: str,
-            matches: DataFrame
-        ) -> DataFrame:
-        
-        team_matches = matches[
-            (matches["home_team"] == team_name) | (matches["away_team"] == team_name)
-        ]
-        
-        
-        team_matches["match_option"] = team_matches.apply(
-            lambda row: f"{row['match_date']}: {row['home_team']} vs {row['away_team']}",
-            axis=1
-        )
-        
-        return team_matches   
-    
     def get_team_lineup(
             self,
             match_id: int,
@@ -68,31 +50,6 @@ class StatsBombRepository:
         ) -> Dict[str, DataFrame]:
         
         return sb.events(match_id=match_id, split=True, flatten_attrs=False)   
-    
-    def get_match_event(
-            self,
-            match_id: int,
-            match_event: MatchEvent,
-            split_events_dict: Dict[str, DataFrame] | None = None
-        ) -> DataFrame:
-        events_dataframe_dict = pd.DataFrame()
-        
-        if split_events_dict is not None:
-            events_dataframe_dict = split_events_dict
-        else:
-            events_dataframe_dict = self.get_split_match_events(match_id)
-        
-        return events_dataframe_dict[match_event.value]
-    
-    def get_player_event(
-            self,
-            match_id: int,
-            player_name: str,
-            match_event: MatchEvent,
-        ) -> DataFrame:
-        
-        match_event = self.get_match_event(match_id, match_event)
-        return match_event[match_event["player"] == player_name]
     
     def get_team_match_info(
             self,

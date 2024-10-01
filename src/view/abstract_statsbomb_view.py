@@ -119,11 +119,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         with st.expander("Events Dataframe", expanded=True):
             selected_event = st.selectbox("Event", MatchEvent.to_value_list(), index=2)
         
-            event = self.statsbomb_repository.get_match_event(
-                match_info["match_id"], 
-                MatchEvent(selected_event),
-                events_dict
-            )
+            event = self.get_cached_match_event(match_info["match_id"], MatchEvent(selected_event))
         
             selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
             
@@ -145,7 +141,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     def player_fragment(self, team_name: str, team_matches: DataFrame) -> None:
         team_match_option = SelectBoxes.match_select(team_matches)
         
-        match_info, match = self.statsbomb_repository.get_team_match_info(team_matches, team_match_option)
+        match_info, _ = self.statsbomb_repository.get_team_match_info(team_matches, team_match_option)
         
         team_lineup = self.get_cached_team_lineup(match_info["match_id"], team_name)
         
@@ -169,7 +165,15 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_team_matches(_self, matches: DataFrame, team_name: str) -> DataFrame:
-        return _self.statsbomb_repository.get_team_matches(team_name, matches)
+        team_matches = matches[
+            (matches["home_team"] == team_name) | (matches["away_team"] == team_name)
+        ]
+        
+        team_matches["match_option"] = team_matches.apply(
+            lambda row: f"{row['match_date']}: {row['home_team']} vs {row['away_team']}",
+            axis=1
+        )
+        return team_matches   
 
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_matches(_self, competition_name: str, season_name: str, competition: str) -> DataFrame:
@@ -178,26 +182,20 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_team_lineup(_self, match_id: int, team_name: str) -> DataFrame:
         return _self.statsbomb_repository.get_team_lineup(match_id, team_name)
-    
-    @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_match_event(_self, match_id: int, match_event: MatchEvent) -> DataFrame:
-        return _self.statsbomb_repository.get_match_event(match_id, match_event)
-    
+
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_split_match_events(_self, match_id: int) -> Dict[str, DataFrame]:
         return _self.statsbomb_repository.get_split_match_events(match_id)
     
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_match_events(_self, match_id: int) -> DataFrame:
-        return _self.statsbomb_repository.get_match_events(match_id)
+    def get_cached_match_event(_self, match_id: int, match_event: MatchEvent) -> DataFrame:
+        match_events_dict = _self.get_cached_split_match_events(match_id)
+        return match_events_dict[match_event.value]    
     
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_player_event(_self, match_info, player_name, selected_event):
-        return _self.statsbomb_repository.get_player_event(
-            match_info["match_id"], 
-            player_name,
-            MatchEvent(selected_event)
-        )
+        match_event = _self.get_cached_match_event(match_info["match_id"], MatchEvent(selected_event))
+        return match_event[match_event["player"] == player_name]
     
     def match_plots(self, match_info: Dict, events_info: Dict) -> None:
         add_vertical_space(2)
