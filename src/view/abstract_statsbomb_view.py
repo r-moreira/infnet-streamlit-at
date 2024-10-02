@@ -4,6 +4,9 @@ import json
 import logging
 import time
 from typing import List, Tuple, Dict 
+import matplotlib.pyplot as plt
+from mplsoccer import Pitch
+import seaborn as sns
 import pandas as pd
 from pandas import DataFrame
 import plotly.express as px
@@ -155,7 +158,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         player_events_info = self.statsbomb_repository.get_player_events_info(player_name, match_event_dict)
         
-        self.player_plots(player_name, player_events_info)        
+        self.player_plots(player_name, player_events_info, match_info)        
         
         st.divider()
         
@@ -271,7 +274,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         with col4:
             st.metric("Total Duels", events_info["total_duels"])
             
-    def player_plots(self, player_name: str, events_info: Dict) -> None:
+    def player_plots(self, player_name: str, events_info: Dict, match_info: Dict) -> None:
         add_vertical_space(2)
             
         st.markdown(f"<h3 style='text-align: center;'>{player_name}</h3>", unsafe_allow_html=True)
@@ -291,6 +294,46 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             
         with col4:
             st.metric("Total Duels", events_info["total_duels"])
+            
+        st.divider()
+        
+        passes_events = self.get_cached_player_event(match_info, player_name, 'passes')
+        events_1=passes_events[['team', 'type', 'minute', 'location', 'pass_end_location', 'pass_outcome', 'player']].reset_index()
+        st.dataframe(events_1)
+        Loc = events_1['location']
+        Loc = pd.DataFrame(Loc.to_list(), columns=['x', 'y'])
+        
+        pitch = Pitch(pitch_type='statsbomb', pitch_color='grass', line_color='#c7d5cc',
+                  stripe=True)
+        fig, ax = pitch.draw()
+
+
+        kde = sns.kdeplot(
+            x=Loc['x'],
+            y=Loc['y'],
+            shade=True,
+            thresh=0.05,
+            alpha = 0.5,
+            n_levels=12,
+            cmap = 'gnuplot'
+        )
+
+        for i in range(len(events_1)):
+            if events_1.pass_outcome[i]=='Incomplete' or events_1.pass_outcome[i]=='Unknown':
+                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='red')
+                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='red')
+            elif events_1.pass_outcome[i]=='Pass Offside':
+                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='blue')
+                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='blue')
+            elif events_1.pass_outcome[i]=='Out':
+                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='yellow')
+                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='yellow')
+            else:
+                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='black')
+                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='black')
+                
+        st.pyplot(fig)
+            
                 
     def team_plots(self, team_info: Dict, competition_name: str) -> None:
         add_vertical_space(2)
