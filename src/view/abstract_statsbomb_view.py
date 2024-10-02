@@ -5,6 +5,7 @@ import logging
 import time
 from typing import List, Tuple, Dict 
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from mplsoccer import Pitch
 import seaborn as sns
 import pandas as pd
@@ -296,17 +297,16 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             st.metric("Total Duels", events_info["total_duels"])
             
         st.divider()
+ 
+        st.markdown(f"<h3 style='text-align: center;'>Passes</h3>", unsafe_allow_html=True)
         
-        passes_events = self.get_cached_player_event(match_info, player_name, 'passes')
-        events_1=passes_events[['team', 'type', 'minute', 'location', 'pass_end_location', 'pass_outcome', 'player']].reset_index()
-        st.dataframe(events_1)
-        Loc = events_1['location']
+        passes_events = self.get_cached_player_event(match_info, player_name, 'passes').reset_index()
+        Loc = passes_events['location']
         Loc = pd.DataFrame(Loc.to_list(), columns=['x', 'y'])
         
         pitch = Pitch(pitch_type='statsbomb', pitch_color='grass', line_color='#c7d5cc',
                   stripe=True)
         fig, ax = pitch.draw()
-
 
         kde = sns.kdeplot(
             x=Loc['x'],
@@ -318,21 +318,56 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             cmap = 'gnuplot'
         )
 
-        for i in range(len(events_1)):
-            if events_1.pass_outcome[i]=='Incomplete' or events_1.pass_outcome[i]=='Unknown':
-                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='red')
-                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='red')
-            elif events_1.pass_outcome[i]=='Pass Offside':
-                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='blue')
-                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='blue')
-            elif events_1.pass_outcome[i]=='Out':
-                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='yellow')
-                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='yellow')
+        for i in range(len(passes_events)):
+            if passes_events.pass_outcome[i]=='Incomplete' or passes_events.pass_outcome[i]=='Unknown':
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='red')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='red')
+            elif passes_events.pass_outcome[i]=='Pass Offside':
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='blue')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='blue')
+            elif passes_events.pass_outcome[i]=='Out':
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='yellow')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='yellow')
             else:
-                plt.plot((events_1.location[i][0], events_1.pass_end_location[i][0]), (events_1.location[i][1], events_1.pass_end_location[i][1]), color='black')
-                plt.scatter(events_1.location[i][0], events_1.location[i][1], color='black')
-                
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='black')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='black')
+        
         st.pyplot(fig)
+        
+        st.markdown("""
+        <style>
+        .legend-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        legend_html = """
+        <div class="legend-box">
+            <div class="legend-color" style="background-color: red;"></div>
+            <span>Incomplete/Unknown</span>
+        </div>
+        <div class="legend-box">
+            <div class="legend-color" style="background-color: blue;"></div>
+            <span>Pass Offside</span>
+        </div>
+        <div class="legend-box">
+            <div class="legend-color" style="background-color: yellow;"></div>
+            <span>Out</span>
+        </div>
+        <div class="legend-box">
+            <div class="legend-color" style="background-color: black;"></div>
+            <span>Complete</span>
+        </div>
+        """
+        st.markdown(legend_html, unsafe_allow_html=True)
             
                 
     def team_plots(self, team_info: Dict, competition_name: str) -> None:
