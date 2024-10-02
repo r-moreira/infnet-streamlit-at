@@ -136,3 +136,25 @@ class StatsBombRepository:
             "total_duels": len(split_events_dict[MatchEvent.DUELS.value]),
         }
         
+    def get_player_events_info(self, player_name: str, split_events_dict: Dict[str, pd.DataFrame]) -> Dict:
+        player_events = {
+            MatchEvent.PASSES.value: 0,
+            MatchEvent.SHOTS.value: 0,
+            MatchEvent.DRIBBLES.value: 0,
+            MatchEvent.BLOCKS.value: 0,
+            MatchEvent.DUELS.value: 0,
+        }
+        
+        for event_name, event_df in split_events_dict.items():
+            if "player" not in event_df.columns:
+                continue
+            player_event_df = event_df[event_df["player"] == player_name]
+            player_events[event_name] = len(player_event_df)
+        
+        return {
+            "total_passes": player_events[MatchEvent.PASSES.value],
+            "total_shots": player_events[MatchEvent.SHOTS.value],
+            "total_dribbles": player_events[MatchEvent.DRIBBLES.value],
+            "total_blocks": player_events[MatchEvent.BLOCKS.value],
+            "total_duels": player_events[MatchEvent.DUELS.value],
+        }

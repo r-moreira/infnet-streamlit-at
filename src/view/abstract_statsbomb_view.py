@@ -19,9 +19,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from streamlit_extras.add_vertical_space import add_vertical_space
 
-# TODO: Obter dados dos eventos de partidas e jogadores do StatsBomb
-# TODO: Criar visualizações com os dados de eventos obtidos
-# TODO: Criar visualizações com a biblioteca MPLSoccer
+
 class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     logger = logging.getLogger(__name__)
 
@@ -116,7 +114,6 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         st.markdown(f"<h3 style='text-align: center;'>Open Data</h3>", unsafe_allow_html=True)
         
-       
         with st.expander("Events Dataframe", expanded=True):
             selected_event = st.selectbox("Event", MatchEvent.to_value_list(), index=2)
         
@@ -154,21 +151,38 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         player_name = SelectBoxes.player_select(team_lineup)
         
-        #st.dataframe(team_lineup)
+        match_event_dict = self.get_cached_split_match_events(match_info["match_id"])
         
-        selected_event = st.selectbox("Event", PlayerEvent.to_value_list(), index=0)
+        player_events_info = self.statsbomb_repository.get_player_events_info(player_name, match_event_dict)
         
-        event = self.get_cached_player_event(match_info, player_name, selected_event)
+        self.player_plots(player_name, player_events_info)        
         
-        if event is not None:
-            selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
-                
-            st.dataframe(event[selected_columns]) 
-            st.download_button("Download", event[selected_columns].to_csv(), "match_events.csv", "text/csv")
+        st.divider()
+        
+        st.markdown(f"<h3 style='text-align: center;'>Open Data</h3>", unsafe_allow_html=True)
+        
+        with st.expander("Lineup Dataframe", expanded=True):
+            st.dataframe(team_lineup)
+            st.download_button("Download", team_lineup.to_csv(), "team_lineup.csv", "text/csv")
+        
+        with st.expander("Events Dataframe", expanded=False):
+            selected_event = st.selectbox("Event", PlayerEvent.to_value_list(), index=0)
+            
+            event = self.get_cached_player_event(match_info, player_name, selected_event)
+            
+            if event is not None:
+                selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
+                    
+                st.dataframe(event[selected_columns]) 
+                st.download_button("Download", event[selected_columns].to_csv(), "player_events.csv", "text/csv")
 
-        else:
-            add_vertical_space(2)
-            st.warning(f"Event {selected_event} not found for player {player_name}")
+            else:
+                add_vertical_space(2)
+                st.warning(f"Event {selected_event} not found for player {player_name}")
+                
+        with st.expander("Events Metrics Json", expanded=False):
+            st.write(player_events_info)
+            st.download_button("Download", json.dumps(player_events_info, ensure_ascii=False, indent=2), "player_events_info.json", "application/json")
         
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_competitions(_self, competitions_list: List[str]) -> DataFrame:
@@ -257,6 +271,26 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         with col4:
             st.metric("Total Duels", events_info["total_duels"])
             
+    def player_plots(self, player_name: str, events_info: Dict) -> None:
+        add_vertical_space(2)
+            
+        st.markdown(f"<h3 style='text-align: center;'>{player_name}</h3>", unsafe_allow_html=True)
+            
+        add_vertical_space(2)
+        
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
+                    
+        with col1:
+            st.metric("Total Passes", events_info["total_passes"])
+        
+        with col2:
+            st.metric("Total Dribbles", events_info["total_dribbles"])
+            
+        with col3:
+            st.metric("Total Shots", events_info["total_shots"])
+            
+        with col4:
+            st.metric("Total Duels", events_info["total_duels"])
                 
     def team_plots(self, team_info: Dict, competition_name: str) -> None:
         add_vertical_space(2)
