@@ -122,8 +122,6 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             selected_event = st.selectbox("Event", MatchEvent.to_value_list(), index=2)
         
             event = self.get_cached_match_event(match_info["match_id"], MatchEvent(selected_event))
-                    
-            AbstractStatsBombView.logger.info(f"Event {selected_event} shape: {type(event)} {event}")  
             
             if event is not None:
                 selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
@@ -236,140 +234,17 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         except Exception as e:
             AbstractStatsBombView.logger.debug(f"Player {player_name} not found in the match selected event: {selected_event}")
             return None
-            
+    
+    @st.cache_data(ttl=3600, show_spinner=True)
+    def get_cached_team_event(_self, match_info: Dict, team_name: str, selected_event: str) -> DataFrame | None:
+        match_event = _self.get_cached_match_event(match_info["match_id"], MatchEvent(selected_event))
         
-    def match_plots(self, match_info: Dict, events_info: Dict) -> None:
-        add_vertical_space(2)
-        
-        st.markdown(f"<h3 style='text-align: center;'>{match_info['home_team']} vs {match_info['away_team']}</h3>", unsafe_allow_html=True)
-        st.markdown(f"<h4 style='text-align: center;'> At {match_info['stadium']} - {match_info['match_date']}</h4>", unsafe_allow_html=True)
-        
-        add_vertical_space(2)
-        
-        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
-                    
-        with col1:
-            st.metric(f"{match_info['home_team']} Score", match_info["home_score"])
+        try:
+            return match_event[match_event["team"] == team_name]
+        except Exception as e:
+            AbstractStatsBombView.logger.debug(f"Team {team_name} not found in the match selected event: {selected_event}")
+            return None
             
-        with col2:
-            st.metric(f"{match_info['away_team']} Score", match_info["away_score"])
-            
-        with col3:
-            st.metric("Total Goals", match_info["home_score"] +  match_info["away_score"])
-        
-        with col4:
-            st.metric("Total Shots", events_info["total_shots"])
-            
-        
-        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
-                    
-        with col1:
-            st.metric("Total Passes", events_info["total_passes"])
-        
-        with col2:
-            st.metric("Total Dribbles", events_info["total_dribbles"])
-            
-        with col3:
-            st.metric("Total Blocks", events_info["total_blocks"])
-            
-        with col4:
-            st.metric("Total Duels", events_info["total_duels"])
-            
-    def player_plots(self, player_name: str, events_info: Dict, match_info: Dict) -> None:
-        add_vertical_space(2)
-            
-        st.markdown(f"<h3 style='text-align: center;'>{player_name}</h3>", unsafe_allow_html=True)
-            
-        add_vertical_space(2)
-        
-        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
-                    
-        with col1:
-            st.metric("Total Passes", events_info["total_passes"])
-        
-        with col2:
-            st.metric("Total Dribbles", events_info["total_dribbles"])
-            
-        with col3:
-            st.metric("Total Shots", events_info["total_shots"])
-            
-        with col4:
-            st.metric("Total Duels", events_info["total_duels"])
-            
-        st.divider()
- 
-        st.markdown(f"<h3 style='text-align: center;'>Passes</h3>", unsafe_allow_html=True)
-        
-        passes_events = self.get_cached_player_event(match_info, player_name, 'passes').reset_index()
-        Loc = passes_events['location']
-        Loc = pd.DataFrame(Loc.to_list(), columns=['x', 'y'])
-        
-        pitch = Pitch(pitch_type='statsbomb', pitch_color='grass', line_color='#c7d5cc',
-                  stripe=True)
-        fig, ax = pitch.draw()
-
-        kde = sns.kdeplot(
-            x=Loc['x'],
-            y=Loc['y'],
-            shade=True,
-            thresh=0.05,
-            alpha = 0.5,
-            n_levels=12,
-            cmap = 'gnuplot'
-        )
-
-        for i in range(len(passes_events)):
-            if passes_events.pass_outcome[i]=='Incomplete' or passes_events.pass_outcome[i]=='Unknown':
-                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='red')
-                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='red')
-            elif passes_events.pass_outcome[i]=='Pass Offside':
-                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='blue')
-                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='blue')
-            elif passes_events.pass_outcome[i]=='Out':
-                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='yellow')
-                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='yellow')
-            else:
-                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='black')
-                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='black')
-        
-        st.pyplot(fig)
-        
-        st.markdown("""
-        <style>
-        .legend-box {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        legend_html = """
-        <div class="legend-box">
-            <div class="legend-color" style="background-color: red;"></div>
-            <span>Incomplete/Unknown</span>
-        </div>
-        <div class="legend-box">
-            <div class="legend-color" style="background-color: blue;"></div>
-            <span>Pass Offside</span>
-        </div>
-        <div class="legend-box">
-            <div class="legend-color" style="background-color: yellow;"></div>
-            <span>Out</span>
-        </div>
-        <div class="legend-box">
-            <div class="legend-color" style="background-color: black;"></div>
-            <span>Complete</span>
-        </div>
-        """
-        st.markdown(legend_html, unsafe_allow_html=True)
-            
-                
     def team_plots(self, team_info: Dict, competition_name: str) -> None:
         add_vertical_space(2)
         
@@ -466,3 +341,223 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         col1, col2 = st.columns(2)
         col1.plotly_chart(fig_avg_goals_bar)
         col2.plotly_chart(fig_avg_goals_pie)
+        
+    def match_plots(self, match_info: Dict, events_info: Dict) -> None:
+        add_vertical_space(2)
+        
+        st.markdown(f"<h3 style='text-align: center;'>{match_info['home_team']} vs {match_info['away_team']}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h4 style='text-align: center;'> At {match_info['stadium']} - {match_info['match_date']}</h4>", unsafe_allow_html=True)
+        
+        add_vertical_space(2)
+        
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
+                    
+        with col1:
+            st.metric(f"{match_info['home_team']} Score", match_info["home_score"])
+            
+        with col2:
+            st.metric(f"{match_info['away_team']} Score", match_info["away_score"])
+            
+        with col3:
+            st.metric("Total Goals", match_info["home_score"] +  match_info["away_score"])
+        
+        with col4:
+            st.metric("Total Shots", events_info["total_shots"])
+            
+        
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
+                    
+        with col1:
+            st.metric("Total Passes", events_info["total_passes"])
+        
+        with col2:
+            st.metric("Total Dribbles", events_info["total_dribbles"])
+            
+        with col3:
+            st.metric("Total Blocks", events_info["total_blocks"])
+            
+        with col4:
+            st.metric("Total Duels", events_info["total_duels"])
+            
+        
+        st.divider()
+ 
+        st.markdown(f"<h3 style='text-align: center;'>Shots by {match_info['home_team']}</h3>", unsafe_allow_html=True)
+        
+        add_vertical_space(1)
+        
+        shot_events_home = self.get_cached_team_event(match_info, match_info["home_team"], 'shots').reset_index()
+        shot_events_away = self.get_cached_team_event(match_info, match_info["away_team"], 'shots').reset_index()
+        shots_coords_home = shot_events_home['location']
+        shots_coords_home = pd.DataFrame(shots_coords_home.to_list(), columns=['x', 'y'])
+        shots_coords_away = shot_events_away['location']
+        shots_coords_away = pd.DataFrame(shots_coords_away.to_list(), columns=['x', 'y'])
+        
+        add_vertical_space(1)
+        
+        self.plot_team_shots(shot_events_home, shots_coords_home)
+        
+        add_vertical_space(2)
+        
+        st.markdown(f"<h3 style='text-align: center;'>Shots by {match_info['away_team']}</h3>", unsafe_allow_html=True)
+        
+        self.plot_team_shots(shot_events_away, shots_coords_away)
+        
+            
+    def player_plots(self, player_name: str, events_info: Dict, match_info: Dict) -> None:
+        add_vertical_space(2)
+            
+        st.markdown(f"<h3 style='text-align: center;'>{player_name}</h3>", unsafe_allow_html=True)
+            
+        add_vertical_space(2)
+        
+        _, col1, col2, col3, col4, _ = st.columns([1, 3, 3, 3, 3, 1], gap="large")
+                    
+        with col1:
+            st.metric("Total Passes", events_info["total_passes"])
+        
+        with col2:
+            st.metric("Total Dribbles", events_info["total_dribbles"])
+            
+        with col3:
+            st.metric("Total Shots", events_info["total_shots"])
+            
+        with col4:
+            st.metric("Total Duels", events_info["total_duels"])
+            
+        st.divider()
+ 
+        st.markdown(f"<h3 style='text-align: center;'>Passes</h3>", unsafe_allow_html=True)
+        
+        add_vertical_space(1)
+        
+        passes_events = self.get_cached_player_event(match_info, player_name, 'passes').reset_index()
+        
+        self.plot_player_passes(passes_events)
+        
+    def plot_team_shots(self, shot_events: DataFrame, shots_coords: DataFrame):
+        pitch = Pitch(pitch_type='statsbomb', pitch_color='grass', line_color='#c7d5cc', stripe=True)
+        fig, ax = pitch.draw()
+        
+        kde = sns.kdeplot(
+            x=shots_coords['x'],
+            y=shots_coords['y'],
+            fill=True,
+            thresh=0.05,
+            alpha = 0.7,
+            n_levels=12,
+            cmap = 'gnuplot'
+        )
+        
+        for i in range(len(shot_events)):
+            if shot_events.shot_outcome[i]=='Goal':
+                pitch.arrows(shot_events.location[i][0], shot_events.location[i][1], shot_events.shot_end_location[i][0], shot_events.shot_end_location[i][1], ax=ax, color='green', width=3)
+                pitch.scatter(shot_events.location[i][0], shot_events.location[i][1], ax = ax, color='green', alpha=1)
+            elif shot_events.shot_outcome[i] in ['Blocked', 'Saved']:
+                pitch.arrows(shot_events.location[i][0], shot_events.location[i][1], shot_events.shot_end_location[i][0], shot_events.shot_end_location[i][1], ax=ax, color='red', width=3)
+                pitch.scatter(shot_events.location[i][0], shot_events.location[i][1], ax = ax, color='red', alpha=1)
+            else:
+                pitch.arrows(shot_events.location[i][0], shot_events.location[i][1], shot_events.shot_end_location[i][0], shot_events.shot_end_location[i][1], ax=ax, color='orange', width=3)
+                pitch.scatter(shot_events.location[i][0], shot_events.location[i][1], ax = ax, color='orange', alpha=1)
+
+        st.pyplot(fig)
+        
+        st.markdown("""
+            <style>
+            .legend-box {
+                display: flex;
+                align-items: center;
+                margin-bottom: 5px;
+            }
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
+        legend_html = """
+            <div class="legend-box">
+                <div class="legend-color" style="background-color: green;"></div>
+                <span>Goal</span>
+            </div>
+            <div class="legend-box">
+                <div class="legend-color" style="background-color: red;"></div>
+                <span>Blocked/Saved</span>
+            </div>
+            <div class="legend-box">
+                <div class="legend-color" style="background-color: orange;"></div>
+                <span>Other</span>
+            </div>
+        """
+        
+        st.markdown(legend_html, unsafe_allow_html=True)
+        
+    def plot_player_passes(self, passes_events):
+        coords = passes_events['location']
+        coords = pd.DataFrame(coords.to_list(), columns=['x', 'y'])
+        
+        pitch = Pitch(pitch_type='statsbomb', pitch_color='grass', line_color='#c7d5cc', stripe=True)
+        fig, ax = pitch.draw()
+
+        kde = sns.kdeplot(
+            x=coords['x'],
+            y=coords['y'],
+            fill=True,
+            thresh=0.05,
+            alpha = 0.5,
+            n_levels=12,
+            cmap = 'gnuplot'
+        )
+
+        for i in range(len(passes_events)):
+            if passes_events.pass_outcome[i]=='Incomplete' or passes_events.pass_outcome[i]=='Unknown':
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='red')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='red')
+            elif passes_events.pass_outcome[i]=='Pass Offside':
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='blue')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='blue')
+            elif passes_events.pass_outcome[i]=='Out':
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='yellow')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='yellow')
+            else:
+                plt.plot((passes_events.location[i][0], passes_events.pass_end_location[i][0]), (passes_events.location[i][1], passes_events.pass_end_location[i][1]), color='black')
+                plt.scatter(passes_events.location[i][0], passes_events.location[i][1], color='black')
+        
+        st.pyplot(fig)
+        
+        st.markdown("""
+            <style>
+            .legend-box {
+                display: flex;
+                align-items: center;
+                margin-bottom: 5px;
+            }
+            .legend-color {
+                width: 20px;
+                height: 20px;
+                margin-right: 10px;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
+        legend_html = """
+            <div class="legend-box">
+                <div class="legend-color" style="background-color: red;"></div>
+                <span>Incomplete/Unknown</span>
+            </div>
+            <div class="legend-box">
+                <div class="legend-color" style="background-color: blue;"></div>
+                <span>Pass Offside</span>
+            </div>
+            <div class="legend-box">
+                <div class="legend-color" style="background-color: yellow;"></div>
+                <span>Out</span>
+            </div>
+            <div class="legend-box">
+                <div class="legend-color" style="background-color: black;"></div>
+                <span>Complete</span>
+            </div>
+        """
+        st.markdown(legend_html, unsafe_allow_html=True)

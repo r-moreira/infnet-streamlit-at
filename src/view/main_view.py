@@ -15,8 +15,19 @@ class MainView(AbstractStreamlitView):
         ) -> None:
         self.sidebar_view = sidebar_view
         self.view_strategy_list = view_strategy_list
+     
+    @st.dialog("Error")
+    def global_error_dialog(self) -> None:
+        st.error(f"Something went wrong :(")
         
     def render(self) -> None:
+        try:
+            self.do_render()
+        except Exception as e:
+            logging.error(f"Error rendering View: {e}")
+            self.global_error_dialog()
+
+    def do_render(self):
         st.set_page_config(
             page_title="Soccer Analysis App",
             page_icon="⚽",
