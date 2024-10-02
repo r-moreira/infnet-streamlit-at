@@ -49,7 +49,7 @@ class StatsBombRepository:
             match_id: int
         ) -> Dict[str, DataFrame]:
         
-        return sb.events(match_id=match_id, split=True, flatten_attrs=False)   
+        return sb.events(match_id=match_id, split=True, flatten_attrs=True)   
     
     def get_team_match_info(
             self,

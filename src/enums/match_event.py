@@ -31,5 +31,6 @@ class MatchEvent(Enum):
     TACTICAL_SHIFTS = 'tactical_shifts'
     FIFTY_FIFTYS = '50/50s'
     
+    
     def to_value_list() -> List:
         return [e.value for e in MatchEvent]

@@ -121,11 +121,17 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
             selected_event = st.selectbox("Event", MatchEvent.to_value_list(), index=2)
         
             event = self.get_cached_match_event(match_info["match_id"], MatchEvent(selected_event))
-        
-            selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
+                    
+            AbstractStatsBombView.logger.info(f"Event {selected_event} shape: {type(event)} {event}")  
             
-            st.dataframe(event[selected_columns]) 
-            st.download_button("Download", event[selected_columns].to_csv(), "match_events.csv", "text/csv")
+            if event is not None:
+                selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
+                
+                st.dataframe(event[selected_columns]) 
+                st.download_button("Download", event[selected_columns].to_csv(), "match_events.csv", "text/csv")
+            else:
+                add_vertical_space(1)
+                st.warning(f"Event {selected_event} not found in the match")
         
         with st.expander("Match Dataframe", expanded=False):
             st.dataframe(match)
@@ -154,10 +160,15 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         event = self.get_cached_player_event(match_info, player_name, selected_event)
         
-        selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
-            
-        st.dataframe(event[selected_columns]) 
-        st.download_button("Download", event[selected_columns].to_csv(), "match_events.csv", "text/csv")
+        if event is not None:
+            selected_columns = st.multiselect("Columns", event.columns, default=event.columns)
+                
+            st.dataframe(event[selected_columns]) 
+            st.download_button("Download", event[selected_columns].to_csv(), "match_events.csv", "text/csv")
+
+        else:
+            add_vertical_space(2)
+            st.warning(f"Event {selected_event} not found for player {player_name}")
         
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_competitions(_self, competitions_list: List[str]) -> DataFrame:
@@ -191,13 +202,24 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
     @st.cache_data(ttl=3600, show_spinner=True)
     def get_cached_match_event(_self, match_id: int, event: MatchEvent | PlayerEvent) -> DataFrame:
         match_events_dict = _self.get_cached_split_match_events(match_id)
-        return match_events_dict[event.value]    
+        match_event = match_events_dict.get(event.value)
+        
+        if type(match_event) is not DataFrame:
+            return None
+        
+        return match_event
     
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_player_event(_self, match_info: Dict, player_name: str, selected_event: str):
+    def get_cached_player_event(_self, match_info: Dict, player_name: str, selected_event: str) -> DataFrame | None:
         match_event = _self.get_cached_match_event(match_info["match_id"], MatchEvent(selected_event))
-        return match_event[match_event["player"] == player_name]
-    
+        
+        try:
+            return match_event[match_event["player"] == player_name]
+        except Exception as e:
+            AbstractStatsBombView.logger.debug(f"Player {player_name} not found in the match selected event: {selected_event}")
+            return None
+            
+        
     def match_plots(self, match_info: Dict, events_info: Dict) -> None:
         add_vertical_space(2)
         

@@ -21,6 +21,9 @@ class PlayerEvent(Enum):
     SHOTS = 'shots'
     GOAL_KEEPERS = 'goal_keepers'
     INJURY_STOPPAGES = 'injury_stoppages'
+    SUBSTITUTIONS = 'substitutions'
+    BAD_BEHAVIOURS = 'bad_behaviours'
+    FIFTY_FIFTYS = '50/50s'
     
     def to_value_list() -> List:
         return [e.value for e in PlayerEvent]
