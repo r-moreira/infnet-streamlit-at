@@ -9,6 +9,7 @@ from pandas import DataFrame
 import plotly.express as px
 from components.selectboxes import SelectBoxes
 from enums.match_event import MatchEvent
+from enums.player_event import PlayerEvent
 from repository.statsbomb_repository import StatsBombRepository
 from service.session_state_service import SessionStateService
 from view.abstract_streamlit_view import AbstractStreamlitView
@@ -149,7 +150,7 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         #st.dataframe(team_lineup)
         
-        selected_event = st.selectbox("Event", MatchEvent.to_value_list(), index=2)
+        selected_event = st.selectbox("Event", PlayerEvent.to_value_list(), index=0)
         
         event = self.get_cached_player_event(match_info, player_name, selected_event)
         
@@ -188,12 +189,12 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         return _self.statsbomb_repository.get_split_match_events(match_id)
     
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_match_event(_self, match_id: int, match_event: MatchEvent) -> DataFrame:
+    def get_cached_match_event(_self, match_id: int, event: MatchEvent | PlayerEvent) -> DataFrame:
         match_events_dict = _self.get_cached_split_match_events(match_id)
-        return match_events_dict[match_event.value]    
+        return match_events_dict[event.value]    
     
     @st.cache_data(ttl=3600, show_spinner=True)
-    def get_cached_player_event(_self, match_info, player_name, selected_event):
+    def get_cached_player_event(_self, match_info: Dict, player_name: str, selected_event: str):
         match_event = _self.get_cached_match_event(match_info["match_id"], MatchEvent(selected_event))
         return match_event[match_event["player"] == player_name]
     
