@@ -6,8 +6,7 @@
 ### Avisos ao professor:
 Eu preferi criar meu próprio sistema de páginas ao invés de usar o nativo do streamlit, que utiliza o diretório pages.
 
-Escolhi usar os dados de copa do mundo, pois foram os dados que achei com o maior número de temporadas
-
+[Link para acessar o APP](https://infnet-app-at-bdh9wnirzxuufxcrich8sf.streamlit.app/)
 
 ### Sobre o projeto:
 Aplicação para resolver uma série de exercícios com o framework ```Streamlit```
