@@ -16,7 +16,7 @@ class WordCupsView(AbstractStatsBombView):
         super().__init__(statsbomb_repository, session_state_service)
     
     def get_title(self) -> str:
-        return "World Cup Analysis"
+        return "World Cup"
     
     def accept(self, view_strategy: ViewStrategy) -> bool:
         return view_strategy == ViewStrategy.WORLD_CUPS

@@ -15,7 +15,7 @@ class InternationalCompetitionsView(AbstractStatsBombView):
         super().__init__(statsbomb_repository, session_state_service)
         
     def get_title(self) -> str:
-        return "International Competitions Analysis"
+        return "International Competitions"
     
     def accept(self, view_strategy: ViewStrategy) -> bool:
         return view_strategy == ViewStrategy.INTERNATIONAL_COMPETITIONS

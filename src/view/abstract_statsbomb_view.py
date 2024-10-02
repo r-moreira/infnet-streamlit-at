@@ -283,15 +283,17 @@ class AbstractStatsBombView(AbstractStreamlitView, AbstractViewStrategy):
         
         st.divider()
         add_vertical_space(2)
-        radar_data = {
-            "Metric": ["Total Wins", "Total Losses", "Total Draws", "Total Goals Scored", "Total Goals Conceded"],
-            "Value": [team_info["total_wins"], team_info["total_losses"], team_info["total_draws"], team_info["total_goals_scored"], team_info["total_goals_conceded"]]
-        }
-        radar_df = pd.DataFrame(radar_data)
-        fig_radar = px.line_polar(radar_df, r="Value", theta="Metric", line_close=True)
-        fig_radar.update_traces(fill='toself')
-        st.markdown(f"<h5 style='text-align: center;'>Team Performance Radar Chart</h5>", unsafe_allow_html=True)
-        st.plotly_chart(fig_radar)
+        
+        # Radar Chart Disabled, don't make much sense for team data
+        # radar_data = {
+        #     "Metric": ["Total Wins", "Total Losses", "Total Draws", "Total Goals Scored", "Total Goals Conceded"],
+        #     "Value": [team_info["total_wins"], team_info["total_losses"], team_info["total_draws"], team_info["total_goals_scored"], team_info["total_goals_conceded"]]
+        # }
+        # radar_df = pd.DataFrame(radar_data)
+        # fig_radar = px.line_polar(radar_df, r="Value", theta="Metric", line_close=True)
+        # fig_radar.update_traces(fill='toself')
+        # st.markdown(f"<h5 style='text-align: center;'>Team Performance Radar Chart</h5>", unsafe_allow_html=True)
+        # st.plotly_chart(fig_radar)
         
         col1, col2 = st.columns(2)
         
