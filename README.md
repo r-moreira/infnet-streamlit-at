@@ -6,7 +6,8 @@
 ### Avisos ao professor:
 Eu preferi criar meu próprio sistema de páginas ao invés de usar o nativo do streamlit, que utiliza o diretório pages.
 
-[Link para acessar o APP](https://infnet-app-at-bdh9wnirzxuufxcrich8sf.streamlit.app/)
+* [Link para acessar o APP](https://infnet-app-at-bdh9wnirzxuufxcrich8sf.streamlit.app/)
+* [Link do repositório no GitHub](https://github.com/r-moreira/infnet-streamlit-at)
 
 ### Sobre o projeto:
 Aplicação para resolver uma série de exercícios com o framework ```Streamlit```
